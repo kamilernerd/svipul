@@ -38,7 +38,8 @@ install: svipul-snmp svipul-addjob
 	@install -D -m 0755 svipul-addjob ${DESTDIR}${PREFIX}/bin/svipul-addjob
 	@install -D -m 0644 svipul-snmp.1 ${DESTDIR}${PREFIX}/share/man/man1/svipul-snmp.1
 	@install -D -m 0644 svipul-addjob.1 ${DESTDIR}${PREFIX}/share/man/man1/svipul-addjob.1
-	@install -D -m 0644 skogul/default.json ${DESTDIR}/etc/svipul/output.d/default.json
+	@install -D -m 0644 docs/examples/output/default.json ${DESTDIR}/etc/svipul/output.d/default.json
+	@install -D -m 0644 docs/examples/snmp.toml ${DESTDIR}/etc/svipul/snmp.toml
 	@cd docs; \
 	find . -type f -exec install -D -m 0644 {} ${DESTDIR}${DOCDIR}/{} \;
 	@install -D -m 0644 README.rst LICENSE -t ${DESTDIR}${DOCDIR}/

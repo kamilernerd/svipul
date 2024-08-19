@@ -1,9 +1,16 @@
 {
-	"handlers": {
-		"svipul": {
-			"sender": "print",
-			"transformers": ["now"],
-			"parser": "skogul"
-		}
-	}
+  "handlers": {
+    "svipul": {
+      "parser": "skogul",
+      "transformers": ["now","testit"],
+      "sender": "print"
+    }
+  },
+  "transformers": {
+    "testit":{
+      "type": "dictsplit",
+      "field": [],
+      "metadataname":"ifName"
+    }
+  }
 }

@@ -315,8 +315,9 @@ func (t *Task) bwCB(pdu gosnmp.SnmpPDU) error {
 	} else if node.Type.BaseType == types.BaseTypeEnum {
 		if t.ParserOptions.FormatEnums {
 			v = foo.Formatted
+		} else {
+			v = foo.Int64
 		}
-		v = foo.Int64
 	} else if node.Type.BaseType == types.BaseTypeOctetString {
 		if node.Type.Format == "" {
 			switch foo.Raw.(type) {

@@ -41,6 +41,7 @@ import (
 	"github.com/telenornms/skogul"
 	sconfig "github.com/telenornms/skogul/config"
 	"github.com/telenornms/svipul"
+
 	//	"github.com/sleepinggenius2/gosmi/models"
 	"github.com/sleepinggenius2/gosmi/types"
 	"github.com/telenornms/svipul/inventory"
@@ -54,6 +55,11 @@ type Task struct {
 	OMap   *omap.OMap    // Engine populates uniquely for each target
 	Metric skogul.Metric // New metric for each run.
 	Result ResolveM
+	ParserOptions
+}
+
+type ParserOptions struct {
+	FormatEnums bool
 }
 
 // Engine is semi-global state for SNMP, including a "cached" OMap ... map
@@ -168,7 +174,11 @@ func (e *Engine) Run(o Order) error {
 		return nil
 	}
 
-	t := Task{}
+	t := Task{
+		ParserOptions: ParserOptions{
+			FormatEnums: o.FormatEnums,
+		},
+	}
 	if o.Key != "" {
 		t.OMap, err = e.GetOmap(o.Target, o.Key, sess)
 		if err != nil {
@@ -299,10 +309,14 @@ func (t *Task) bwCB(pdu gosnmp.SnmpPDU) error {
 	foo := node.Type.FormatValue(pdu.Value)
 	if node.Type.BaseType == types.BaseTypeUnknown ||
 		node.Type.BaseType == types.BaseTypeObjectIdentifier ||
-		node.Type.BaseType == types.BaseTypeEnum ||
 		node.Type.BaseType == types.BaseTypeBits ||
 		node.Type.BaseType == types.BaseTypePointer {
 		v = foo.Formatted
+	} else if node.Type.BaseType == types.BaseTypeEnum {
+		if t.ParserOptions.FormatEnums {
+			v = foo.Formatted
+		}
+		v = foo.Int64
 	} else if node.Type.BaseType == types.BaseTypeOctetString {
 		if node.Type.Format == "" {
 			switch foo.Raw.(type) {
@@ -361,15 +375,16 @@ func (t *Task) bwCB(pdu gosnmp.SnmpPDU) error {
 // result by default. This behavior can be overridden by providing "oid" to
 // leave OIDs unresolved and "Resolve" to attempt to always resolve them.
 type Order struct {
-	Target    string   // Host/target
-	Oids      []string // OIDs, also accepts logical names (e.g.: ifName)
-	Elements  []string // Elemnts, if GetElements mode. Elements == interfaces (could be other in the future)
-	Key       string   // Map key to use for looking up elements
-	Mode      Mode     // What mode to use
-	Community string   `json:",omitempty"` // Community to use, blank == figure it out yourself/use default (meaning depends on issuer)
-	ID        string   `json:",omitempty"`
-	Result    ResolveM // Auto (default) = resolve based on input, OID = leave OIDs unresolved, Resolve = try to resolve
-	delivery  amqp.Delivery
+	Target      string   // Host/target
+	Oids        []string // OIDs, also accepts logical names (e.g.: ifName)
+	Elements    []string // Elemnts, if GetElements mode. Elements == interfaces (could be other in the future)
+	Key         string   // Map key to use for looking up elements
+	Mode        Mode     // What mode to use
+	Community   string   `json:",omitempty"` // Community to use, blank == figure it out yourself/use default (meaning depends on issuer)
+	ID          string   `json:",omitempty"`
+	Result      ResolveM // Auto (default) = resolve based on input, OID = leave OIDs unresolved, Resolve = try to resolve
+	delivery    amqp.Delivery
+	FormatEnums bool `json:"FormatEnums"`
 }
 
 func (o Order) String() string {

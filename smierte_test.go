@@ -34,7 +34,7 @@ func TestLoading(t *testing.T) {
 	if err != nil {
 		t.Errorf("failed to load smi modules: %v", err)
 	}
-	
+
 	sysName := "1.3.6.1.2.1.1.5"
 	sysName543 := "1.3.6.1.2.1.1.5.543"
 	sysName123 := "1.3.6.1.2.1.1.5.123"

@@ -24,9 +24,9 @@
 package svipul
 
 import (
-	"time"
 	"fmt"
 	"github.com/BurntSushi/toml"
+	"time"
 )
 
 type conf struct {
@@ -35,18 +35,18 @@ type conf struct {
 	Debug            bool
 	MibPaths         []string
 	MibModules       []string
-	OutputConfig	 string
-	Broker		 string
+	OutputConfig     string
+	Broker           string
 	MaxMapAge        time.Duration
 }
 
 var Config conf = conf{
 	DefaultCommunity: "public",
-	Workers:	  10,
+	Workers:          10,
 	Debug:            false,
 	MibPaths:         []string{"mibs/modules"},
 	MaxMapAge:        time.Second * 3600,
-	Broker:		  "amqp://guest:guest@localhost:5672/",
+	Broker:           "amqp://guest:guest@localhost:5672/",
 	OutputConfig:     "/etc/svipul/output.d/",
 	MibModules: []string{
 		"ADSL-LINE-MIB",
@@ -147,7 +147,6 @@ var Config conf = conf{
 		"VRRP-MIB",
 		"VRRPV3-MIB"},
 }
-
 
 func ParseConfig(f string) error {
 
